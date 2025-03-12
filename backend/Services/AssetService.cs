@@ -1,12 +1,15 @@
 using AutoMapper;
-using Backend.DTO;
-using Backend.Exceptions;
-using Backend.Models;
-using Backend.Parameters;
+using backend.DTO;
+using backend.Exceptions;
+using backend.Models;
+using backend.Parameters;
 using Microsoft.EntityFrameworkCore;
 
-namespace Backend.Services;
+namespace backend.Services;
 
+/// <summary>
+/// Service to handle asset operations.
+/// </summary>
 public class AssetService
 {
     private readonly DataContext _context;
@@ -18,6 +21,11 @@ public class AssetService
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Get all assets based on query parameters.
+    /// </summary>
+    /// <param name="query">The query parameters for filtering assets.</param>
+    /// <returns>A list of asset information.</returns>
     public async Task<List<AssetInfoDTO>> GetAll(AssetGetAllQueryParameters query)
     {
         var search = _context.Assets.Select(a => a);
@@ -30,6 +38,11 @@ public class AssetService
         return _mapper.Map<List<AssetInfoDTO>>(assets);
     }
 
+    /// <summary>
+    /// Get an asset by ID.
+    /// </summary>
+    /// <param name="id">The ID of the asset.</param>
+    /// <returns>The asset information.</returns>
     public async Task<AssetInfoDTO?> Get(Guid id)
     {
         var asset = await _context.Assets
@@ -38,6 +51,13 @@ public class AssetService
         return asset == null ? null : _mapper.Map<AssetInfoDTO>(asset);
     }
 
+    /// <summary>
+    /// Update an asset by ID.
+    /// </summary>
+    /// <param name="id">The ID of the asset.</param>
+    /// <param name="asset">The asset information to update.</param>
+    /// <exception cref="EntityValidationException">Thrown when the IDs do not match.</exception>
+    /// <exception cref="EntityNotFoundException">Thrown when the asset is not found.</exception>
     public async Task Update(Guid id, AssetInfoDTO asset)
     {
         if (asset.Id != id)
@@ -56,6 +76,11 @@ public class AssetService
         await _context.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Delete an asset by ID.
+    /// </summary>
+    /// <param name="id">The ID of the asset.</param>
+    /// <exception cref="EntityNotFoundException">Thrown when the asset is not found.</exception>
     public async Task Delete(Guid id)
     {
         var existedAsset = await _context.Assets.FindAsync(id);
@@ -69,6 +94,11 @@ public class AssetService
         await _context.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Create a new asset.
+    /// </summary>
+    /// <param name="input">The asset creation data.</param>
+    /// <returns>The created asset information.</returns>
     public async Task<AssetInfoDTO> Create(AssetCreateDTO input)
     {
         Asset asset = _mapper.Map<Asset>(input);

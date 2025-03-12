@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Backend.Models;
+namespace backend.Models;
 
 /// <summary>
 /// Base class with Id, CreateAt, UpdateAt

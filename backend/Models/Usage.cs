@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Backend.Models;
+namespace backend.Models;
 
 /// <summary>
 /// Usage model, representing an usage in the borrowing system.
@@ -12,19 +12,19 @@ public class Usage : BaseEntity
     /// The start datetime
     /// </summary>
     [Column("start_time")]
-    public DateTime startTime { get; set; }
+    public DateTime StartTime { get; set; }
 
     /// <summary>
     /// The end datetime
     /// </summary>
     [Column("end_time")]
-    public DateTime endTime { get; set; }
+    public DateTime EndTime { get; set; }
 
     /// <summary>
     /// The Other Information
     /// </summary>
     [Column("other_info")]
-    public string otherInfo { get; set; } = string.Empty;
+    public string OtherInfo { get; set; } = string.Empty;
 
 
     /// <summary>

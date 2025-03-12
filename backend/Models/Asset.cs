@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Backend.Models;
+namespace backend.Models;
 
 /// <summary>
 /// Asset model, representing an asset in the borrowing system.
@@ -17,13 +17,13 @@ public class Asset: BaseEntity
     /// Is available to appoint
     /// </summary>
     [Column("is_available")]
-    public bool isAvailable { get; set; } = true;
+    public bool IsAvailable { get; set; } = true;
 
     /// <summary>
     /// The Other Information
     /// </summary>
     [Column("other_info")]
-    public string otherInfo { get; set; } = string.Empty;
+    public string OtherInfo { get; set; } = string.Empty;
 
     /// <summary>
     /// A collection of usages associated with the asset.

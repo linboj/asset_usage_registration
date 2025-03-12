@@ -1,10 +1,10 @@
 using AutoMapper;
-using Backend.DTO;
-using Backend.Exceptions;
-using Backend.Models;
+using backend.DTO;
+using backend.Exceptions;
+using backend.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Backend.Services;
+namespace backend.Services;
 
 public class RoleService
 {
@@ -17,6 +17,11 @@ public class RoleService
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Get a role by ID.
+    /// </summary>
+    /// <param name="id">The ID of the role.</param>
+    /// <returns>The role information.</returns>
     public async Task<RoleInfoDTO?> Get(Guid id)
     {
         var role = await _context.Roles
@@ -25,6 +30,10 @@ public class RoleService
         return role == null ? null : _mapper.Map<RoleInfoDTO>(role);
     }
 
+    /// <summary>
+    /// Delete a role by ID.
+    /// </summary>
+    /// <param name="id">The ID of the role.</param>
     public async Task Delete(Guid id)
     {
         var existedRole = await _context.Roles.FindAsync(id);
@@ -38,6 +47,11 @@ public class RoleService
         await _context.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Create a new role.
+    /// </summary>
+    /// <param name="input">The role creation data.</param>
+    /// <returns>The created role information.</returns>
     public async Task<RoleInfoDTO> Create(RoleCreateDTO input)
     {
         var isWithSameRole = await _context.Roles.Where(r => r.Name == input.Name.ToString() && r.UserId == input.UserId).AnyAsync();

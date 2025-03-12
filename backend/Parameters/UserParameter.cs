@@ -1,7 +1,16 @@
-namespace Backend.Parameters;
+using Microsoft.AspNetCore.Mvc;
 
+namespace backend.Parameters;
+
+/// <summary>
+/// Query parameters for retrieving all users
+/// </summary>
 public class UserGetAllQueryParameters
 {
-    public RoleEnum RoleType { get; set; } = RoleEnum.All;
+    /// <summary>
+    /// Filter users by role type
+    /// </summary>
+    [FromQuery]
+    public RoleQueryEnum RoleType { get; set; } = RoleQueryEnum.All;
 }
 

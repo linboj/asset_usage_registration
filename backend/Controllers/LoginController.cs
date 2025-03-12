@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using Backend.Services;
+using backend.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
-using Backend.Parameters;
-using Backend.Exceptions;
+using backend.Parameters;
+using backend.Exceptions;
 
-namespace Backend.Controllers
+namespace backend.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
@@ -19,29 +19,42 @@ namespace Backend.Controllers
             _service = service;
         }
 
-        [Route("401")]
+        /// <summary>
+        /// Returns 401 Unauthorized status.
+        /// </summary>
+        /// <returns>401 Unauthorized status.</returns>
+        [HttpGet("401")]
         public ActionResult Unauthorized401()
         {
             return Unauthorized();
         }
 
-        [Route("403")]
+        /// <summary>
+        /// Returns 403 Forbidden status.
+        /// </summary>
+        /// <returns>403 Forbidden status.</returns>
+        [HttpGet("403")]
         public ActionResult Forbidden403()
         {
             return Forbid();
         }
 
+        /// <summary>
+        /// Handles user login.
+        /// </summary>
+        /// <param name="input">The login parameters.</param>
+        /// <returns>Ok status if login is successful, otherwise appropriate error status.</returns>
         [HttpPost]
-        public async Task<ActionResult> Login(LoginParameter input)
+        public async Task<ActionResult> Login([FromBody] LoginParameter input)
         {
             try
             {
                 var (claimsIdentity, authProperties) = await _service.Login(input);
-                
+
                 await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity),
-                authProperties);
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity),
+                    authProperties);
 
                 return Ok();
             }
@@ -55,6 +68,9 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// Handles user logout.
+        /// </summary>
         [HttpDelete]
         public void logout()
         {

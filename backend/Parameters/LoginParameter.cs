@@ -1,7 +1,17 @@
-namespace Backend.Parameters;
+namespace backend.Parameters;
 
+/// <summary>
+/// Parameters for user login.
+/// </summary>
 public class LoginParameter
 {
-    public string UserName { get; set; }
-    public string Password { get; set; }
+    /// <summary>
+    /// The username of the user.
+    /// </summary>
+    public required string UserName { get; set; }
+
+    /// <summary>
+    /// The password of the user.
+    /// </summary>
+    public required string Password { get; set; }
 }

@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Backend.Models;
+namespace backend.Models;
 
 /// <summary>
 /// Salt model, representing a salt used in user password hashing and salting.

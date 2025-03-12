@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using Backend.Models;
-using Backend.Services;
-using Backend.Parameters;
-using Backend.DTO;
-using Backend.Exceptions;
+using backend.Services;
+using backend.Parameters;
+using backend.DTO;
+using backend.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Backend.Controllers
+namespace backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -15,14 +14,21 @@ namespace Backend.Controllers
     {
         private readonly AssetService _service;
 
+        // Constructor to initialize the AssetService
         public AssetController(AssetService service)
         {
             _service = service;
         }
 
-        // GET: api/Asset
+        /// <summary>
+        /// Retrieve all assets based on query parameters
+        /// </summary>
+        /// <param name="query">Query parameters for filtering assets</param>
+        /// <returns>List of assets</returns>
+        /// <response code="200">Returns the list of assets</response>
+        /// <response code="500">If there is an internal server error</response>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AssetInfoDTO>>> GetAssets(AssetGetAllQueryParameters query)
+        public async Task<ActionResult<IEnumerable<AssetInfoDTO>>> GetAssets([AsParameters] AssetGetAllQueryParameters query)
         {
             try
             {
@@ -34,9 +40,16 @@ namespace Backend.Controllers
             }
         }
 
-        // GET: api/Asset/5
+        /// <summary>
+        /// Retrieve a specific asset by ID
+        /// </summary>
+        /// <param name="id">ID of the asset</param>
+        /// <returns>The asset</returns>
+        /// <response code="200">Returns the asset</response>
+        /// <response code="404">If the asset is not found</response>
+        /// <response code="500">If there is an internal server error</response>
         [HttpGet("{id}")]
-        public async Task<ActionResult<AssetInfoDTO>> GetAsset(Guid id)
+        public async Task<ActionResult<AssetInfoDTO>> GetAsset([FromRoute] Guid id)
         {
             try
             {
@@ -52,10 +65,18 @@ namespace Backend.Controllers
             }
         }
 
-        // PUT: api/Asset/5
+        /// <summary>
+        /// Update a specific asset by ID
+        /// </summary>
+        /// <param name="id">ID of the asset</param>
+        /// <param name="asset">Updated asset information</param>
+        /// <response code="204">If the asset is successfully updated</response>
+        /// <response code="400">If the asset data is invalid</response>
+        /// <response code="404">If the asset is not found</response>
+        /// <response code="500">If there is an internal server error</response>
         [HttpPut("{id}")]
         [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> PutAsset(Guid id, AssetInfoDTO asset)
+        public async Task<IActionResult> PutAsset([FromRoute] Guid id, [FromBody] AssetInfoDTO asset)
         {
             try
             {
@@ -76,19 +97,52 @@ namespace Backend.Controllers
             }
         }
 
-        // POST: api/Asset
+        /// <summary>
+        /// Create a new asset
+        /// </summary>
+        /// <param name="body">Asset creation data</param>
+        /// <returns>The created asset</returns>
+        /// <response code="201">Returns the newly created asset</response>
+        /// <response code="400">If the asset data is invalid</response>
+        /// <response code="500">If there is an internal server error</response>
         [HttpPost]
         [Authorize(Roles = "Manager")]
-        public async Task<ActionResult<AssetInfoDTO>> PostAsset(AssetCreateDTO body)
+        public async Task<ActionResult<AssetInfoDTO>> PostAsset([FromBody] AssetCreateDTO body)
         {
             try
             {
-                var Asset = await _service.Create(body);
-                return CreatedAtAction("GetAsset", new { id = Asset.Id }, Asset);
+                var asset = await _service.Create(body);
+                return CreatedAtAction("GetAsset", new { id = asset.Id }, asset);
             }
             catch (EntityValidationException ex)
             {
                 return BadRequest(ex.Errors);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        /// <summary>
+        /// Delete a specific asset by ID
+        /// </summary>
+        /// <param name="id">ID of the asset</param>
+        /// <response code="204">If the asset is successfully deleted</response>
+        /// <response code="404">If the asset is not found</response>
+        /// <response code="500">If there is an internal server error</response>
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> DeleteAsset([FromRoute] Guid id)
+        {
+            try
+            {
+                await _service.Delete(id);
+                return NoContent();
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return NotFound(ex.Errors);
             }
             catch (Exception)
             {
