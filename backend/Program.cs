@@ -1,5 +1,6 @@
 using System.Text.Json;
 using backend.Helpers;
+using backend.Hubs;
 using backend.Models;
 using backend.Profiles;
 using backend.Services;
@@ -34,7 +35,11 @@ builder.Services.AddDbContext<DataContext>(options =>
 
         // Use PostgreSQL database in non-development environments
         string connectionString = $"Host=postgresql_db;Port={(Env["Port"] == null ? "5432" : Env["Port"])};Database={Env["DB"]};Username={Env["USER"]};Password={Env["PW"]}";
-        options.UseNpgsql(connectionString);
+        options.UseNpgsql(connectionString, sqlOptions => sqlOptions.EnableRetryOnFailure(
+                                maxRetryCount: 5,  // Retry up to 5 times
+                                maxRetryDelay: TimeSpan.FromSeconds(10),  // Wait up to 10 seconds between retries
+                                errorCodesToAdd: null  // Optionally add specific SQL error numbers to retry on
+                            ));
     }
 });
 
@@ -52,6 +57,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 // Add AutoMapper with the specified mapping profile
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+// Add SignalR services.
+builder.Services.AddSignalR();
+
 // Add HTTP context accessor
 builder.Services.AddHttpContextAccessor();
 
@@ -61,6 +69,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AssetService>();
 builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<RoleService>();
+builder.Services.AddScoped<InfoUpateService>();
 
 // Register seed helper
 builder.Services.AddScoped<SeedHelper>();
@@ -97,8 +106,18 @@ using (var scope = app.Services.CreateScope())
 
 app.UseHttpsRedirection();
 
+app.UseCookiePolicy();
+app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseWebSockets(new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromSeconds(120),
+});
+
 app.MapControllers();
+
+// Configure the HTTP request pipeline.
+app.MapHub<UsagesOfAssetHub>("/api/v1/update_info");
 
 app.Run();
