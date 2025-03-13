@@ -2,7 +2,6 @@ using System.Security.Claims;
 using AutoMapper;
 using backend.DTO;
 using backend.Exceptions;
-using backend.Helpers;
 using backend.Models;
 using backend.Parameters;
 using Microsoft.EntityFrameworkCore;
@@ -13,14 +12,16 @@ public class UsageService
 {
     private readonly DataContext _context;
     private readonly IMapper _mapper;
+    private readonly InfoUpateService _infoUpate;
     private readonly Guid _userId;
     private readonly bool _isManager;
 
     // Constructor to initialize the UsageService
-    public UsageService(DataContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+    public UsageService(DataContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor, InfoUpateService infoUpate)
     {
         _context = context;
         _mapper = mapper;
+        _infoUpate = infoUpate;
         var Claims = httpContextAccessor.HttpContext.User.Claims.ToList();
         _userId = new Guid(Claims.Where(a => a.Type == "UserId").First().Value);
         _isManager = Claims.Where(a => a.Type == ClaimTypes.Role).Any(r => r.Value == "Manager");
@@ -93,6 +94,8 @@ public class UsageService
 
         _context.Usages.Update(existedUsage).CurrentValues.SetValues(usage);
         await _context.SaveChangesAsync();
+        var updatedInfo = _mapper.Map<UsageDetailDTO>(existedUsage);
+        _ = _infoUpate.SendUsageUpdateInfo(updatedInfo.AssetId.ToString(), updatedInfo);
     }
 
     /// <summary>
@@ -135,8 +138,10 @@ public class UsageService
 
         _context.Usages.Add(newUsage);
         await _context.SaveChangesAsync();
+        var updatedInfo = _mapper.Map<UsageDetailDTO>(newUsage);
+        _ = _infoUpate.SendUsageUpdateInfo(updatedInfo.AssetId.ToString(), updatedInfo);
 
-        return _mapper.Map<UsageDetailDTO>(newUsage);
+        return updatedInfo;
     }
 
     // Method to check if an asset is used in a specific date-time range
