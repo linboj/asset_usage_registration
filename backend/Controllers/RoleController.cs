@@ -7,9 +7,9 @@ using backend.Parameters;
 
 namespace backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Manager")]
+    [Authorize(Roles = "User")]
     public class RoleController : ControllerBase
     {
         private readonly RoleService _service;
@@ -24,16 +24,40 @@ namespace backend.Controllers
         /// </summary>
         /// <param name="id">The ID of the role.</param>
         /// <returns>The role information.</returns>
+        [HttpGet]
+        public async Task<ActionResult<List<string>>> GetRolesOfUser([FromRoute] Guid id)
+        {
+            try
+            {
+                var claims = HttpContext.User.Claims.ToList();
+                var userId = claims.Where(a => a.Type == "UserId").First().Value;
+                if (userId == null) return Unauthorized();
+                var roles = await _service.GetAllOfUser(Guid.Parse(userId));
+
+                return roles;
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        /// <summary>
+        /// Get a role by ID.
+        /// </summary>
+        /// <param name="id">The ID of the role.</param>
+        /// <returns>The role information.</returns>
+        [Authorize(Roles = "Manager")]
         [HttpGet("{id}")]
         public async Task<ActionResult<RoleInfoDTO>> GetRole([FromRoute] Guid id)
         {
             try
             {
-                var asset = await _service.Get(id);
+                var role = await _service.Get(id);
 
-                if (asset == null) return NotFound();
+                if (role == null) return NotFound();
 
-                return asset;
+                return role;
             }
             catch (Exception)
             {
@@ -46,7 +70,7 @@ namespace backend.Controllers
         /// </summary>
         /// <param name="body">The role creation data.</param>
         /// <returns>The created role information.</returns>
-        // POST: api/Role
+        [Authorize(Roles = "Manager")]
         [HttpPost]
         public async Task<ActionResult<RoleInfoDTO>> PostRole([FromBody] RoleCreateDTO body)
         {
@@ -70,7 +94,7 @@ namespace backend.Controllers
         /// </summary>
         /// <param name="id">The ID of the role.</param>
         /// <returns>No content if the deletion is successful.</returns>
-        // DELETE: api/Role/5
+        [Authorize(Roles = "Manager")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRole([FromRoute] Guid id)
         {

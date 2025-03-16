@@ -6,7 +6,7 @@ using backend.Exceptions;
 
 namespace backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class UsageController : ControllerBase
     {

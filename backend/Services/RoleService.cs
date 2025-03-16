@@ -18,6 +18,20 @@ public class RoleService
     }
 
     /// <summary>
+    /// Get all roles by User ID.
+    /// </summary>
+    /// <param name="userId">The ID of the user.</param>
+    /// <returns>The role information.</returns>
+    public async Task<List<string>> GetAllOfUser(Guid userId)
+    {
+        var roles = await _context.Roles
+                            .Where(r => r.UserId == userId)
+                            .Select(r => r.Name)
+                            .ToListAsync();
+        return roles;
+    }
+
+    /// <summary>
     /// Get a role by ID.
     /// </summary>
     /// <param name="id">The ID of the role.</param>
@@ -25,7 +39,7 @@ public class RoleService
     public async Task<RoleInfoDTO?> Get(Guid id)
     {
         var role = await _context.Roles
-                            .Where(a => a.Id == id)
+                            .Where(r => r.Id == id)
                             .FirstOrDefaultAsync();
         return role == null ? null : _mapper.Map<RoleInfoDTO>(role);
     }
