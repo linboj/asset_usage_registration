@@ -16,12 +16,12 @@ public class BaseEntity
     /// <summary>
     /// Record Create Time
     /// </summary>
-    [Column("created_at")]
+    [Column("created_at", TypeName = "timestamp")]
     public DateTime CreatedAt { get; set; }
 
     /// <summary>
     /// Record Create Time
     /// </summary>
-    [Column("updated_at")]
+    [Column("updated_at", TypeName = "timestamp")]
     public DateTime UpdatedAt { get; set; }
 }

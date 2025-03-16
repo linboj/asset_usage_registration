@@ -11,7 +11,7 @@ public class Role: BaseEntity
     /// <summary>
     /// The name of the role.
     /// </summary>
-    [Column("name")]
+    [Column("name", TypeName = "nvarchar(100)")]
     public string Name { get; set; } = string.Empty;
 
     /// <summary>

@@ -11,21 +11,20 @@ public class Usage : BaseEntity
     /// <summary>
     /// The start datetime
     /// </summary>
-    [Column("start_time")]
+    [Column("start_time", TypeName = "timestamp")]
     public DateTime StartTime { get; set; }
 
     /// <summary>
     /// The end datetime
     /// </summary>
-    [Column("end_time")]
+    [Column("end_time", TypeName = "timestamp")]
     public DateTime EndTime { get; set; }
 
     /// <summary>
     /// The Other Information
     /// </summary>
-    [Column("other_info")]
+    [Column("other_info", TypeName = "nvarchar(255)")]
     public string OtherInfo { get; set; } = string.Empty;
-
 
     /// <summary>
     /// The associated user.

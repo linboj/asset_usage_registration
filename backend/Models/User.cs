@@ -12,7 +12,7 @@ public class User : BaseEntity
     /// <summary>
     /// The user's login username.
     /// </summary>
-    [Column("user_name")]
+    [Column("user_name", TypeName = "nvarchar(100)")]
     public required string UserName { get; set; }
 
     /// <summary>
@@ -24,7 +24,7 @@ public class User : BaseEntity
     /// <summary>
     /// The full name of the user.
     /// </summary>
-    [Column("full_name")]
+    [Column("full_name", TypeName = "nvarchar(100)")]
     public string FullName { get; set; } = string.Empty;
 
     /// <summary>

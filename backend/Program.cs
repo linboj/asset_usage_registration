@@ -20,27 +20,21 @@ builder.Services.AddControllers()
 
 builder.Services.AddDbContext<DataContext>(options =>
 {
-    if (builder.Environment.IsDevelopment())
-    {
-        // Use SQLite database in development environment
-        options.UseSqlite("Data Source=test.sqlite");
-    }
-    else
-    {
-        var Env = Environment.GetEnvironmentVariables();
+    var Env = Environment.GetEnvironmentVariables();
 
-        // // Use MYSQL database in non-development environments
-        // string connectionString = $"Server=mysql_db;Port=3306;Database={Env["DB"]};User ID={Env["USER"]};Password={Env["PW"]}";
-        // options.UseMySql(connectionString, new MySqlServerVersion(new Version(9, 2, 0)));
+    // // Use MYSQL database in non-development environments
+    // string server = builder.Environment.IsDevelopment() ? "localhost" : "mysql_db";
+    // string connectionString = $"Server=mysql_db;Port=3306;Database={Env["DB"]};User ID={Env["USER"]};Password={Env["PW"]}";
+    // options.UseMySql(connectionString, new MySqlServerVersion(new Version(9, 2, 0)));
 
-        // Use PostgreSQL database in non-development environments
-        string connectionString = $"Host=postgresql_db;Port={(Env["Port"] == null ? "5432" : Env["Port"])};Database={Env["DB"]};Username={Env["USER"]};Password={Env["PW"]}";
-        options.UseNpgsql(connectionString, sqlOptions => sqlOptions.EnableRetryOnFailure(
-                                maxRetryCount: 5,  // Retry up to 5 times
-                                maxRetryDelay: TimeSpan.FromSeconds(10),  // Wait up to 10 seconds between retries
-                                errorCodesToAdd: null  // Optionally add specific SQL error numbers to retry on
-                            ));
-    }
+    // Use PostgreSQL database in non-development environments
+    string host = builder.Environment.IsDevelopment() ? "localhost" : "postgresql_db";
+    string connectionString = $"Host={host};Port={(Env["Port"] == null ? "5432" : Env["Port"])};Database={Env["DB"]};Username={Env["USER"]};Password={Env["PW"]}";
+    options.UseNpgsql(connectionString, sqlOptions => sqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 5,  // Retry up to 5 times
+                            maxRetryDelay: TimeSpan.FromSeconds(10),  // Wait up to 10 seconds between retries
+                            errorCodesToAdd: null  // Optionally add specific SQL error numbers to retry on
+                        ));
 });
 
 // Configure authentication using cookies
