@@ -21,7 +21,7 @@ public class InfoUpateService
     /// </summary>
     /// <param name="groupName">The group Name to send updated Info </param>
     /// <param name="updatedInfo">The updated usage detail info</param>
-    public async Task SendUsageUpdateInfo(string groupName, UsageDetailDTO updatedInfo)
+    public async Task SendUsageUpdateInfo(string groupName, UsageDataChangeDTO updatedInfo)
     {
         await _hubContext.Clients.Group(groupName).SendAsync("ReceiveUpdatedInfo", updatedInfo);
     }

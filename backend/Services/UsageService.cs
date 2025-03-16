@@ -95,7 +95,8 @@ public class UsageService
         _context.Usages.Update(existedUsage).CurrentValues.SetValues(usage);
         await _context.SaveChangesAsync();
         var updatedInfo = _mapper.Map<UsageDetailDTO>(existedUsage);
-        _ = _infoUpate.SendUsageUpdateInfo(updatedInfo.AssetId.ToString(), updatedInfo);
+        var dataChange = new UsageDataChangeDTO { Data = updatedInfo, Action = "Update" };
+        _ = _infoUpate.SendUsageUpdateInfo(updatedInfo.AssetId.ToString(), dataChange);
     }
 
     /// <summary>
@@ -115,9 +116,11 @@ public class UsageService
         {
             throw new EntityValidationException(["No delete permission"]);
         }
-
+        var assetId = existedUsage.AssetId;
         _context.Usages.Remove(existedUsage);
         await _context.SaveChangesAsync();
+        var dataChange = new UsageDataChangeDTO { Data = new UsageDetailDTO { Id = id }, Action = "Delete" };
+        _ = _infoUpate.SendUsageUpdateInfo(assetId.ToString(), dataChange);
     }
 
     /// <summary>
@@ -139,7 +142,8 @@ public class UsageService
         _context.Usages.Add(newUsage);
         await _context.SaveChangesAsync();
         var updatedInfo = _mapper.Map<UsageDetailDTO>(newUsage);
-        _ = _infoUpate.SendUsageUpdateInfo(updatedInfo.AssetId.ToString(), updatedInfo);
+        var dataChange = new UsageDataChangeDTO { Data = updatedInfo, Action = "Create" };
+        _ = _infoUpate.SendUsageUpdateInfo(updatedInfo.AssetId.ToString(), dataChange);
 
         return updatedInfo;
     }
